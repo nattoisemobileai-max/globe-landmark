@@ -13,15 +13,65 @@
         crossorigin=""></script>
 
     <style>
-        body { font-family: Arial, sans-serif; display: flex; flex-direction: column; align-items: center; margin: 0; background-color: #f4f4f4; }
-        #map { height: 600px; width: 80%; border: 3px solid #333; margin-top: 20px; }
-        #game-container { padding: 20px; background: white; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); width: 80%; max-width: 800px; margin-top: 20px; }
+        body { 
+            font-family: Arial, sans-serif; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            margin: 0; 
+            background-color: #f4f4f4; 
+            min-height: 100vh; /* Ensure body takes full height */
+        }
+        #map { 
+            /* *** CRITICAL FIX: Ensure the map container has explicit dimensions *** */
+            height: 600px; 
+            width: 80%; 
+            max-width: 900px;
+            border: 3px solid #333; 
+            margin-top: 20px; 
+            margin-bottom: 40px;
+        }
+        #game-container { 
+            padding: 20px; 
+            background: white; 
+            border-radius: 8px; 
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1); 
+            width: 80%; 
+            max-width: 900px; 
+            margin-top: 20px; 
+        }
         #setup-screen { text-align: center; }
-        .cartoon-face { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; cursor: pointer; margin: 5px; border: 2px solid transparent; transition: border-color 0.2s; }
+        .cartoon-face { 
+            width: 50px; 
+            height: 50px; 
+            border-radius: 50%; 
+            object-fit: cover; 
+            cursor: pointer; 
+            margin: 5px; 
+            border: 2px solid transparent; 
+            transition: border-color 0.2s; 
+            line-height: 50px; /* Center emoji */
+            font-size: 2em;
+            display: inline-block;
+            text-align: center;
+        }
         .cartoon-face.selected { border-color: #007bff; box-shadow: 0 0 5px #007bff; }
         button, input[type="text"] { padding: 10px; margin: 5px; border-radius: 5px; border: 1px solid #ccc; }
         button { background-color: #007bff; color: white; cursor: pointer; border: none; }
-        #bingo-message { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); padding: 50px; background: rgba(0, 123, 255, 0.9); color: white; border-radius: 15px; font-size: 3em; z-index: 1000; display: none; text-align: center;}
+        #bingo-message { 
+            position: fixed; /* Use fixed to ensure visibility over everything */
+            top: 50%; 
+            left: 50%; 
+            transform: translate(-50%, -50%); 
+            padding: 50px; 
+            background: rgba(0, 123, 255, 0.9); 
+            color: white; 
+            border-radius: 15px; 
+            font-size: 3em; 
+            z-index: 1000; 
+            display: none; 
+            text-align: center;
+        }
     </style>
 </head>
 <body>
