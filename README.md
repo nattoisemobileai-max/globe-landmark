@@ -1,0 +1,2 @@
+# globe-landmark
+global Landmark
