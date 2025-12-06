@@ -1,5 +1,4 @@
-// --- Landmark Data (Pre-defined dataset for no external Geocoding API) ---
-// Max 10 landmarks from Europe, North America, and Asia.
+// --- Landmark Data (Pre-defined dataset) ---
 const landmarks = [
     // Europe
     { name: "Eiffel Tower", region: "Europe", lat: 48.8584, lng: 2.2945 },
@@ -23,12 +22,31 @@ let map = null;
 let guessedLandmarkCoords = null;
 let selectedFace = null;
 
+// --- Map Initialization ---
+
+function initMap() {
+    // Check if map already exists
+    if (map) {
+        map.remove();
+    }
+    
+    // Initialize Leaflet Map (Default view over the world)
+    map = L.map('map').setView([20, 0], 2); 
+
+    // Add OpenStreetMap tiles (this provides the "Earth" background)
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 18,
+        attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    // This is often a fix for map rendering issues when placed within complex layouts
+    map.invalidateSize(); 
+}
+
 // --- Step 1 Functions: Setup ---
 
 function selectFace(element) {
-    // Deselect all faces
     document.querySelectorAll('.cartoon-face').forEach(f => f.classList.remove('selected'));
-    // Select the clicked face
     element.classList.add('selected');
     selectedFace = element.getAttribute('data-face');
 }
@@ -50,28 +68,11 @@ function startGame() {
     document.getElementById('setup-screen').style.display = 'none';
     document.getElementById('game-screen').style.display = 'block';
 
-    // Initialize Map
-    initMap();
-    // console.log("Target Landmark:", targetLandmark.name); // Uncomment this line for testing!
-}
-
-// --- Map Initialization ---
-
-function initMap() {
-    // Check if map already exists
+    // The map is initialized when the DOM loads, so we don't need to call initMap here.
+    // However, we call map.invalidateSize() again to be safe.
     if (map) {
-        map.remove();
+        map.invalidateSize();
     }
-    
-    // Initialize Leaflet Map (Default view over the world)
-    // Leaflet provides the 2D "Google Earth" view using map tiles.
-    map = L.map('map').setView([20, 0], 2); 
-
-    // Add OpenStreetMap tiles (this provides the "Earth" background)
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 18,
-        attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
-    }).addTo(map);
 }
 
 
@@ -79,10 +80,7 @@ function initMap() {
 
 function checkGuess() {
     const guessName = document.getElementById('landmark-input').value.trim();
-    
-    // Find the landmark in our static JSON database
     const guessLandmark = landmarks.find(l => l.name.toLowerCase() === guessName.toLowerCase());
-    
     const resultDiv = document.getElementById('result-message');
     
     if (!guessLandmark) {
@@ -90,10 +88,8 @@ function checkGuess() {
         return;
     }
 
-    // Found the coordinates from our internal data
     guessedLandmarkCoords = [guessLandmark.lat, guessLandmark.lng];
     
-    // Show the location on the Earth
     // 1. Clear previous guess marker
     map.eachLayer(function (layer) {
         if (layer instanceof L.Marker && layer !== map.guessMarker) {
@@ -151,33 +147,27 @@ function displayBingo(name) {
 
 /**
  * Calculates the distance between two geographical points using the Haversine formula.
- * @param {number} lat1 - Latitude of point 1.
- * @param {number} lon1 - Longitude of point 1.
- * @param {number} lat2 - Latitude of point 2.
- * @param {number} lon2 - Longitude of point 2.
- * @returns {number} The distance in kilometers.
  */
 function calculateHaversineDistance(lat1, lon1, lat2, lon2) {
     const R = 6371; // Radius of the Earth in kilometers
     
-    // Function to convert degrees to radians
     const toRad = (angle) => angle * (Math.PI / 180);
 
-    // Convert all coordinates to radians
     const phi1 = toRad(lat1);
     const phi2 = toRad(lat2);
     const deltaPhi = toRad(lat2 - lat1);
     const deltaLambda = toRad(lon2 - lon1);
 
-    // The Haversine formula core calculation
     const a = Math.sin(deltaPhi / 2) * Math.sin(deltaPhi / 2) +
               Math.cos(phi1) * Math.cos(phi2) * Math.sin(deltaLambda / 2) * Math.sin(deltaLambda / 2);
     
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
-    const distance = R * c; // Distance in km
+    const distance = R * c; 
     return distance;
 }
 
-// Initial call to set up the map area before the game starts
-initMap();
+// *** CRITICAL FIX: Ensure the DOM is fully loaded before initializing the map ***
+window.addEventListener('DOMContentLoaded', () => {
+    initMap();
+});
