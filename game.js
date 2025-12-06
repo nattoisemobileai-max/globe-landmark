@@ -1,12 +1,21 @@
 // --- Landmark Data (Pre-defined dataset for no external Geocoding API) ---
-// Note: Names must match exactly for the guess to be recognized.
+// Max 10 landmarks from Europe, North America, and Asia.
 const landmarks = [
+    // Europe
     { name: "Eiffel Tower", region: "Europe", lat: 48.8584, lng: 2.2945 },
     { name: "Colosseum", region: "Europe", lat: 41.8902, lng: 12.4924 },
+    { name: "Stonehenge", region: "Europe", lat: 51.1789, lng: -1.8262 },
+    
+    // North America
     { name: "Statue of Liberty", region: "North America", lat: 40.6892, lng: -74.0445 },
-    { name: "Machu Picchu", region: "South America", lat: -13.1631, lng: -72.5450 }, // Added one outside the requested list for variety
+    { name: "Golden Gate Bridge", region: "North America", lat: 37.8199, lng: -122.4783 },
+    { name: "Niagara Falls", region: "North America", lat: 43.0828, lng: -79.0742 },
+
+    // Asia
     { name: "Great Wall of China", region: "Asia", lat: 40.4319, lng: 116.5704 },
-    { name: "Burj Khalifa", region: "Asia", lat: 25.1972, lng: 55.2744 }
+    { name: "Burj Khalifa", region: "Asia", lat: 25.1972, lng: 55.2744 },
+    { name: "Mount Fuji", region: "Asia", lat: 35.3606, lng: 138.7292 },
+    { name: "Taj Mahal", region: "Asia", lat: 27.1751, lng: 78.0421 }
 ];
 
 let targetLandmark = null;
@@ -43,7 +52,7 @@ function startGame() {
 
     // Initialize Map
     initMap();
-    console.log("Target Landmark:", targetLandmark.name); // Keep this in the console for development testing!
+    // console.log("Target Landmark:", targetLandmark.name); // Uncomment this line for testing!
 }
 
 // --- Map Initialization ---
@@ -55,6 +64,7 @@ function initMap() {
     }
     
     // Initialize Leaflet Map (Default view over the world)
+    // Leaflet provides the 2D "Google Earth" view using map tiles.
     map = L.map('map').setView([20, 0], 2); 
 
     // Add OpenStreetMap tiles (this provides the "Earth" background)
@@ -69,12 +79,14 @@ function initMap() {
 
 function checkGuess() {
     const guessName = document.getElementById('landmark-input').value.trim();
+    
+    // Find the landmark in our static JSON database
     const guessLandmark = landmarks.find(l => l.name.toLowerCase() === guessName.toLowerCase());
     
     const resultDiv = document.getElementById('result-message');
     
     if (!guessLandmark) {
-        resultDiv.innerHTML = `<span style="color: red;">"${guessName}" is not in our landmark database. Try again!</span>`;
+        resultDiv.innerHTML = `<span style="color: red;">"${guessName}" is not in our landmark database. Please type one of the pre-defined names exactly.</span>`;
         return;
     }
 
@@ -89,7 +101,7 @@ function checkGuess() {
         }
     });
 
-    // 2. Add new guess marker
+    // 2. Add new guess marker (Step 2: Show location of filled-in landmark)
     map.guessMarker = L.marker(guessedLandmarkCoords).addTo(map)
         .bindPopup(`Guessed: ${guessLandmark.name}`)
         .openPopup();
